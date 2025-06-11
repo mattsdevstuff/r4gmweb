@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R4GM Website Strategy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Visualization & Content Choices remain the same as the previous version -->
+    <style>
+        html, body {
+            height: 100%;
+            overflow: hidden; /* Prevent body scroll */
+        }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #F5F5DC; 
+            color: #333; 
+            display: flex;
+            flex-direction: column;
+        }
+        .section-title { color: #228B22; border-bottom: 2px solid #228B22; padding-bottom: 0.5rem; }
+        .card { background-color: #FFFFFF; border: 1px solid #E8E8E8; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+        .button-accent { background-color: #E07A5F; color: white; transition: background-color 0.3s ease; }
+        .button-accent:hover { background-color: #D46A4B; }
+        
+        /* Slideshow Styles */
+        main.slideshow-container {
+            flex-grow: 1;
+            overflow-y: auto; /* Allow individual slides to scroll if content overflows */
+            padding-bottom: 80px; /* Space for nav */
+        }
+        .slide {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            animation: fadeIn 0.7s;
+            padding-bottom: 4rem; /* Add padding for content at the bottom */
+        }
+        .slide.active {
+            display: block;
+            opacity: 1;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Slideshow Navigation */
+        .slideshow-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background-color: rgba(34, 139, 34, 0.95);
+            backdrop-filter: blur(5px);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            z-index: 200;
+        }
+        .slideshow-nav button {
+            background-color: #E07A5F;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .slideshow-nav button:hover {
+            background-color: #D46A4B;
+            transform: scale(1.05);
+        }
+        .slideshow-nav button:disabled {
+            background-color: #A9A9A9;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .slide-indicators {
+            display: flex;
+            gap: 0.75rem;
+        }
+        .indicator-dot {
+            width: 12px;
+            height: 12px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .indicator-dot:hover {
+            transform: scale(1.2);
+        }
+        .indicator-dot.active {
+            background-color: #FFFFFF;
+        }
+        .slide-counter {
+            font-size: 0.875rem;
+            font-weight: 600;
+            min-width: 50px;
+            text-align: right;
+        }
+
+        /* Modal Styles */
+        .modal { display: none; position: fixed; z-index: 300; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
+        .modal-content { background-color: #FFFFFF; margin: 10% auto; padding: 2rem; border-radius: 0.5rem; width: 90%; max-width: 600px; position: relative; }
+        .close-button { position: absolute; top: 1rem; right: 1rem; font-size: 1.5rem; font-weight: bold; cursor: pointer; color: #777; }
+        .close-button:hover { color: #333; }
+        .kpi-stat-lg { font-size: 2.5rem; color: #228B22; font-weight: bold;}
+        .kpi-stat-sm { font-size: 1rem; color: #555;}
+        
+        /* Advanced Search Styles */
+        .search-result-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            transition: background-color 0.2s;
+        }
+        .search-result-card:hover {
+            background-color: #f0f0f0;
+        }
+        .result-badge {
+            flex-shrink: 0;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <header class="bg-[#228B22] text-white p-4 text-center sticky top-0 z-50 shadow-md">
+        <h1 class="text-2xl font-bold">R4GM Web Strategy (Work in Progress)</h1>
+    </header>
+    <main class="slideshow-container container mx-auto p-4 md:p-8">
+        <!-- Slide 1: Overview -->
+        <section id="overview" class="slide py-8 md:py-12">
+            <h2 class="text-3xl font-bold mb-8 section-title">In the last 12 months</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 text-center">
+                <div class="card p-6 rounded-lg flex flex-col justify-center"><div class="kpi-stat-lg">1.2m</div><div class="kpi-stat-sm">visits by residents in the past 12 months</div></div>
+                <div class="card p-6 rounded-lg flex flex-col justify-center"><div class="kpi-stat-lg">51s</div><div class="kpi-stat-sm">average time spent on pages</div></div>
+                <div class="card p-6 rounded-lg flex flex-col justify-center">
+                    <div class="kpi-stat-lg">92,566</div>
+                    <div class="text-xl text-gray-500 -mt-2">views</div>
+                    <div class="kpi-stat-sm mt-2">Find a recycling centre</div>
+                </div>
+                <div class="card p-6 rounded-lg flex flex-col justify-center">
+                    <div class="kpi-stat-lg">77,864</div>
+                    <div class="text-xl text-gray-500 -mt-2">views</div>
+                    <div class="kpi-stat-sm mt-2">Van permit page</div>
+                </div>
+                <div class="card p-6 rounded-lg flex flex-col justify-center">
+                    <div class="kpi-stat-lg">52,100</div>
+                    <div class="text-xl text-gray-500 -mt-2">views</div>
+                    <div class="kpi-stat-sm mt-2">A-Z Guide</div>
+                </div>
+                <div class="card p-6 rounded-lg flex flex-col justify-center">
+                    <div class="kpi-stat-lg">84,056</div>
+                    <div class="text-xl text-gray-500 -mt-2">views</div>
+                    <div class="kpi-stat-sm mt-2">Renew pages (not including online shop)</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 2: Core Pillars Intro -->
+        <section id="pillars-intro" class="slide py-8 md:py-12">
+            <h2 class="text-3xl font-bold mb-8 section-title">Core Strategic Pillars</h2>
+            <p class="mb-8 text-lg text-gray-700">The strategy is built upon core pillars designed to enhance the digital experience for residents. </p>
+            <div class="grid grid-cols-2 lg:grid-cols-5 gap-6">
+                <div class="card p-6 rounded-lg text-center"><span class="text-4xl mb-2 block">🔍</span><h3 class="font-semibold text-xl text-[#228B22]">Search Improvements</h3></div>
+                <div class="card p-6 rounded-lg text-center"><span class="text-4xl mb-2 block">📢</span><h3 class="font-semibold text-xl text-[#228B22]">Campaign Amplifier</h3></div>
+                <div class="card p-6 rounded-lg text-center"><span class="text-4xl mb-2 block">📚</span><h3 class="font-semibold text-xl text-[#228B22]">Education Hub</h3></div>
+                <div class="card p-6 rounded-lg text-center"><span class="text-4xl mb-2 block">📖</span><h3 class="font-semibold text-xl text-[#228B22]">A-Z Guide Optimised</h3></div>
+                <div class="card p-6 rounded-lg text-center">
+                    <span class="text-4xl mb-2 block">📄</span><h3 class="font-semibold text-xl text-[#228B22]">Clear Info Pages</h3>
+                </div>
+            </div>
+             <p class="mt-8 text-center text-lg text-gray-700"></p>
+        </section>
+
+        <!-- Slide 3: Pillar - Search (Advanced) -->
+        <section id="pillar-search" class="slide py-8 md:py-12">
+            <div class="p-6 card rounded-lg">
+                <h3 class="text-2xl font-semibold mb-4 text-[#228B22]"><span class="mr-2">🔍</span>Pillar 1: Improved Search & Information Discovery</h3>
+                <p class="mb-4 text-gray-700">Effective search is foundational. The goal is a sophisticated, intuitive experience ensuring residents find accurate information quickly.</p>
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <div class="relative">
+                        <p class="text-xs text-center text-gray-500 mb-2 italic">-- Interactive Mockup --</p>
+                        <!-- Search Bar -->
+                        <div class="relative flex-grow">
+                            <input id="advanced-search-input" type="text" value="plastic" class="w-full p-3 pl-10 border border-gray-400 rounded-t-lg focus:ring-2 focus:ring-[#228B22] focus:border-transparent z-10">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><i class="fa-solid fa-magnifying-glass"></i></span>
+                        </div>
+                        
+                        <!-- Dropdown Results Panel -->
+                        <div id="search-results-container" class="absolute top-full left-0 right-0 bg-white border border-gray-400 border-t-0 rounded-b-lg shadow-lg z-20">
+                            <!-- A-Z Guide Result -->
+                            <div class="search-result-card">
+                                <div class="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <i class="fa-solid fa-bottle-water fa-lg text-blue-500"></i>
+                                </div>
+                                <div class="flex-grow">
+                                    <h4 class="font-bold">Plastic Bottles</h4>
+                                    <p class="text-sm text-gray-600"><span class="font-semibold">In your Mixed Recycling bin.</span> Empty, rinse, and squash them.</p>
+                                </div>
+                                <span class="result-badge bg-blue-100 text-blue-800">A-Z Guide</span>
+                            </div>
+                            <!-- A-Z Guide Result 2 -->
+                            <div class="search-result-card">
+                                <div class="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <i class="fa-solid fa-ice-cream fa-lg text-blue-500"></i>
+                                </div>
+                                <div class="flex-grow">
+                                    <h4 class="font-bold">Plastic Tubs, Pots & Trays</h4>
+                                    <p class="text-sm text-gray-600"><span class="font-semibold">In your Mixed Recycling bin.</span> Includes butter tubs, yoghurt pots etc.</p>
+                                </div>
+                                <span class="result-badge bg-blue-100 text-blue-800">A-Z Guide</span>
+                            </div>
+                             <!-- News/Campaign Result -->
+                            <div class="search-result-card">
+                                <div class="flex-shrink-0 w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                                    <i class="fa-solid fa-store fa-lg text-orange-500"></i>
+                                </div>
+                                <div class="flex-grow">
+                                    <h4 class="font-bold">Plastic Bags & Film</h4>
+                                    <p class="text-sm text-gray-600"><span class="font-semibold">Take to large supermarkets.</span> Do not put in home recycling bins.</p>
+                                </div>
+                                 <span class="result-badge bg-orange-100 text-orange-800">News</span>
+                            </div>
+                            <!-- Blog Post Result -->
+                             <div class="search-result-card">
+                                <div class="flex-shrink-0 w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                    <i class="fa-solid fa-pen-to-square fa-lg text-green-500"></i>
+                                </div>
+                                <div class="flex-grow">
+                                    <h4 class="font-bold">Plastic Free July: A Beginner's Guide</h4>
+                                    <p class="text-sm text-gray-600">Thinking of reducing your plastic use? Our latest blog has tips...</p>
+                                </div>
+                                <span class="result-badge bg-green-100 text-green-800">Blog</span>
+                            </div>
+                            <!-- Event Result -->
+                            <div class="search-result-card">
+                                <div class="flex-shrink-0 w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                                    <i class="fa-solid fa-calendar-days fa-lg text-purple-500"></i>
+                                </div>
+                                <div class="flex-grow">
+                                    <h4 class="font-bold">Community Litter Pick: Plastic Patrol</h4>
+                                    <p class="text-sm text-gray-600">Join us this Saturday at Heaton Park to help tackle plastic pollution.</p>
+                                </div>
+                                <span class="result-badge bg-purple-100 text-purple-800">Event</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 4: Pillar - Campaigns -->
+        <section id="pillar-campaigns" class="slide py-8 md:py-12">
+             <div class="p-6 card rounded-lg">
+                <h3 class="text-2xl font-semibold mb-6 text-[#228B22]"><span class="mr-2">📢</span>Pillar 2: The Campaigns Hub</h3>
+                <p class="mb-6 text-gray-700">A dynamic hub to inspire action, drive behaviour change, and showcase collective impact.</p>
+                
+                <!-- Featured Campaign -->
+                <div class="bg-gray-100 rounded-lg overflow-hidden md:flex gap-6 p-6 mb-8">
+                    <img src="https://recycleforgreatermanchester.com/wp-content/uploads/2023/08/suez-picture-for-be-battery-aware.jpg?text=Be+Battery+Aware" onerror="this.onerror=null;this.src='https://placehold.co/600x400/E07A5F/FFFFFF?text=Campaign+Image';" alt="Be Battery Aware Campaign" class="w-full md:w-1/2 h-64 object-cover rounded-md">
+                    <div class="p-4 md:p-0 flex flex-col justify-center">
+                        <span class="text-sm font-bold text-orange-600">FEATURED CAMPAIGN</span>
+                        <h4 class="text-3xl font-bold text-gray-800 my-2">#BeBatteryAware</h4>
+                        <p class="text-gray-600 mb-4">Dead batteries thrown in household bins can cause serious fires. Help us keep our collection crews safe.</p>
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm font-semibold text-gray-600 mb-1"><span>75,000 batteries recycled</span><span>Target: 100,000</span></div>
+                            <div class="w-full bg-gray-300 rounded-full h-2.5"><div class="bg-orange-500 h-2.5 rounded-full" style="width: 75%"></div></div>
+                        </div>
+                        <a href="#" class="inline-flex items-center justify-center gap-2 button-accent font-semibold py-3 px-6 rounded-lg text-lg">
+                            <i class="fa-solid fa-map-location-dot"></i>
+                            Find nearest battery drop-off
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Other Campaigns Grid -->
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-gray-50 p-6 rounded-lg flex flex-col text-center">
+                        <h5 class="font-bold text-xl text-[#228B22] mb-3">Right Thing, Right Bin</h5>
+                        <p class="text-gray-600 mb-4 flex-grow">Contamination costs millions. Become a recycling champion with our 2-min quiz.</p>
+                        <a href="#" class="mt-auto inline-flex items-center justify-center gap-2 bg-white border border-[#228B22] text-[#228B22] font-semibold py-2 px-4 rounded-lg hover:bg-green-50">
+                            <i class="fa-solid fa-circle-question"></i>
+                            Take the Quiz
+                        </a>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg flex flex-col text-center">
+                        <h5 class="font-bold text-xl text-[#228B22] mb-3">Let's Compost Now</h5>
+                        <p class="text-gray-600 mb-4 flex-grow">Turn food waste into black gold for your garden. Get a discounted compost bin.</p>
+                        <a href="#" class="mt-auto inline-flex items-center justify-center gap-2 bg-white border border-[#228B22] text-[#228B22] font-semibold py-2 px-4 rounded-lg hover:bg-green-50">
+                            <i class="fa-solid fa-leaf"></i>
+                            Get a Compost Bin
+                        </a>
+                    </div>
+                     <div class="bg-gray-50 p-6 rounded-lg flex flex-col text-center">
+                        <h5 class="font-bold text-xl text-[#228B22] mb-3">Renew, Reuse, Repair</h5>
+                        <p class="text-gray-600 mb-4 flex-grow">Give your old items a new lease of life. Find your local Renew Hub or repair cafe.</p>
+                        <a href="#" class="mt-auto inline-flex items-center justify-center gap-2 bg-white border border-[#228B22] text-[#228B22] font-semibold py-2 px-4 rounded-lg hover:bg-green-50">
+                            <i class="fa-solid fa-screwdriver-wrench"></i>
+                            Find a Repair Cafe
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Slide 5: Pillar - Education -->
+        <section id="pillar-education" class="slide py-8 md:py-12">
+            <div class="p-6 card rounded-lg">
+                <h3 class="text-2xl font-semibold mb-4 text-[#228B22]"><span class="mr-2">📚</span>Pillar 3: Modernising Education Resources</h3>
+                <p class="mb-4 text-gray-700">Accessible and effective education is fundamental. Resources will be interactive and cater to diverse learners.</p>
+                <div class="mb-4">
+                    <label for="persona-selector" class="block text-sm font-medium text-gray-700 mb-1">Select a Learner Persona:</label>
+                    <select id="persona-selector" class="w-full md:w-1/2 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#87CEEB] focus:border-transparent">
+                        <option value="new-resident">New Resident</option>
+                        <option value="eco-student">Eco-Conscious Student</option>
+                        <option value="teacher">Primary School Teacher</option>
+                    </select>
+                </div>
+                <div id="education-content" class="bg-gray-50 p-4 rounded-md min-h-[250px]"></div>
+            </div>
+        </section>
+
+        <!-- Slide 6: Pillar - A-Z Guide -->
+        <section id="pillar-az" class="slide py-8 md:py-12">
+            <div class="p-6 card rounded-lg">
+                <h3 class="text-2xl font-semibold mb-4 text-[#228B22]"><span class="mr-2">📖</span>Pillar 4: Optimising the A-Z Guide</h3>
+                <p class="mb-4 text-gray-700">Enhancements will focus on clarity, usability, and visual aids to reduce "wish-cycling" and improve material quality.</p>
+                 <div class="bg-gray-100 p-4 rounded-md">
+                    <p class="font-medium text-gray-800 mb-2">Mock A-Z Entry: Plastic Bottles</p>
+                    <div class="border border-gray-300 p-4 rounded-md bg-white flex items-start space-x-4">
+                        <div class="flex-shrink-0 w-16 h-16">
+                            <img src="https://recycleforgreatermanchester.com/wp-content/uploads/2017/03/plastic_bottles_rgb_port3-e1606137243856-768x758.jpg?text=Bottle" alt="Plastic Bottle Icon" class="w-full h-full object-cover rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/100x100/87CEEB/FFFFFF?text=Item';">
+                        </div>
+                        <div class="flex-grow">
+                            <p class="font-semibold text-lg">In your <span class="text-[#228B22] font-bold">Mixed Recycling Bin</span></p>
+                            <ul class="list-disc list-inside text-sm text-gray-600 ml-4 mt-1">
+                                <li>EMPTY and RINSE all liquids.</li>
+                                <li>SQUASH the bottle to save space.</li>
+                                <li>Put LIDS and TOPS back on.</li>
+                            </ul>
+                             <div class="mt-4 border-t pt-3">
+                                <h4 class="font-bold text-sm text-gray-800">Top Tips:</h4>
+                                <p class="text-sm text-gray-600 mt-1"><i class="fa-solid fa-check text-green-600 mr-2"></i>Labels can be left on the bottle.</p>
+                                <h4 class="font-bold text-sm text-gray-800 mt-2">Common Mistakes:</h4>
+                                <p class="text-sm text-gray-600 mt-1"><i class="fa-solid fa-xmark text-red-600 mr-2"></i>Do not include bottle pumps (e.g. from soap), as these go in general waste.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 7: Pillar - Enhanced Info Pages -->
+        <section id="pillar-info-pages" class="slide py-8 md:py-12">
+            <div class="p-6 card rounded-lg">
+                <h3 class="text-2xl font-semibold mb-4 text-[#228B22]"><span class="mr-2">📄</span>Pillar 5: Clear Info Pages</h3>
+                <p class="mb-6 text-gray-700">Redesigning key information pages like 'Find a Recycling Centre' and 'Van Permit' to be clearer, more interactive, and mobile-friendly, ensuring residents can find what they need, when they need it.</p>
+                <div class="bg-gray-100 p-6 rounded-lg text-center">
+                     <a href="https://recycleforgreatermanchester.com/van-permit-new/" target="_blank" class="inline-flex items-center justify-center gap-2 button-accent font-semibold py-3 px-6 rounded-lg text-lg">
+                        <i class="fa-solid fa-external-link-alt"></i>
+                        Example
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 8: PWA Future -->
+        <section id="pwa-future" class="slide py-8 md:py-12">
+            <div class="bg-[#E8E8E8] rounded-lg p-6 md:p-8">
+                <h2 class="text-3xl font-bold mb-8 section-title">Future-Proofing with a PWA</h2>
+                <p class="mb-8 text-lg text-gray-700">Transitioning to a Progressive Web App (PWA) will ensure R4GM's digital services are accessible, user-friendly, and resilient, offering an app-like experience.</p>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="card p-6 rounded-lg"><h3 class="font-semibold text-xl mb-2 text-[#228B22]">Enhanced Accessibility</h3><p class="text-sm text-gray-600">Works on all devices from a single codebase. No app store needed.</p></div>
+                    <div class="card p-6 rounded-lg"><h3 class="font-semibold text-xl mb-2 text-[#228B22]">Robust Offline Capabilities</h3><p class="text-sm text-gray-600">Caches content like the A-Z guide for access without internet.</p></div>
+                    <div class="card p-6 rounded-lg"><h3 class="font-semibold text-xl mb-2 text-[#228B22]">Improved User Experience</h3><p class="text-sm text-gray-600">Fast, smooth, and installable to the home screen for quick access.</p></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Slideshow Navigation Controls -->
+    <div class="slideshow-nav">
+        <button id="prevBtn">&larr; Previous</button>
+        <div class="slide-indicators" id="slideIndicators"></div>
+        <div class="flex items-center gap-4">
+            <div id="slideCounter" class="slide-counter"></div>
+            <button id="nextBtn">Next &rarr;</button>
+        </div>
+    </div>
+
+    <!-- Modal remains unchanged -->
+    <div id="campaignModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeModalButton">&times;</span>
+            <h3 id="modalTitle" class="text-2xl font-semibold mb-4 text-[#228B22]"></h3>
+            <p id="modalDetails" class="text-gray-700"></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- Slideshow Logic ---
+            const slides = document.querySelectorAll('.slide');
+            const nextBtn = document.getElementById('nextBtn');
+            const prevBtn = document.getElementById('prevBtn');
+            const indicatorsContainer = document.getElementById('slideIndicators');
+            const slideCounter = document.getElementById('slideCounter');
+            let currentSlide = 0;
+
+            function createIndicators() {
+                indicatorsContainer.innerHTML = ''; // Clear existing indicators
+                slides.forEach((_, i) => {
+                    const dot = document.createElement('div');
+                    dot.classList.add('indicator-dot');
+                    dot.addEventListener('click', () => goToSlide(i));
+                    indicatorsContainer.appendChild(dot);
+                });
+            }
+
+            function updateNav() {
+                if (slideCounter) {
+                    slideCounter.textContent = `${currentSlide + 1} / ${slides.length}`;
+                }
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === currentSlide);
+                });
+                if (indicatorsContainer) {
+                    document.querySelectorAll('.indicator-dot').forEach((dot, i) => {
+                        dot.classList.toggle('active', i === currentSlide)
+                    });
+                }
+                if(prevBtn && nextBtn){
+                    prevBtn.disabled = currentSlide === 0;
+                    nextBtn.disabled = currentSlide === slides.length - 1;
+                }
+            }
+
+            function goToSlide(slideNumber) {
+                if (slideNumber >= 0 && slideNumber < slides.length) {
+                    currentSlide = slideNumber;
+                    updateNav();
+                }
+            }
+            if(nextBtn){
+                nextBtn.addEventListener('click', () => goToSlide(currentSlide + 1));
+            }
+            if(prevBtn){
+                 prevBtn.addEventListener('click', () => goToSlide(currentSlide - 1));
+            }
+
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' && nextBtn) {
+                    nextBtn.click();
+                }
+                if (e.key === 'ArrowLeft' && prevBtn) {
+                    prevBtn.click();
+                }
+            });
+            
+            // --- Modal Logic ---
+            const modal = document.getElementById('campaignModal');
+            const closeModalButton = document.getElementById('closeModalButton');
+            document.querySelectorAll('.campaign-modal-trigger').forEach(button => {
+                button.addEventListener('click', () => {
+                    document.getElementById('modalTitle').textContent = button.dataset.title;
+                    document.getElementById('modalDetails').textContent = button.dataset.details;
+                    modal.style.display = 'block';
+                });
+            });
+            if(closeModalButton) {
+                closeModalButton.addEventListener('click', () => { modal.style.display = 'none'; });
+            }
+            window.addEventListener('click', (event) => { if (event.target === modal) modal.style.display = 'none'; });
+
+            // --- Education Persona Logic ---
+            const personaSelector = document.getElementById('persona-selector');
+            const educationContentDiv = document.getElementById('education-content');
+            const educationData = {
+                'new-resident': {
+                    title: 'Welcome to Greater Manchester!',
+                    resources: [
+                        { type: 'video', icon: 'fa-play-circle', title: 'Your Bin Collection Explained', desc: 'A 2-minute video on what goes in each bin.' },
+                        { type: 'interactive', icon: 'fa-map-location-dot', title: 'Find Your Bin Day', desc: 'Enter your postcode to see your personalised calendar.' },
+                        { type: 'pdf', icon: 'fa-file-pdf', title: 'Printable Bin Guide', desc: 'A handy guide to stick on your fridge.' }
+                    ]
+                },
+                'eco-student': {
+                     title: 'Dig Deeper into the Circular Economy',
+                     resources: [
+                        { type: 'article', icon: 'fa-newspaper', title: 'What is the Circular Economy?', desc: 'Read our in-depth explanation.' },
+                        { type: 'webinar', icon: 'fa-chalkboard-user', title: 'Webinar: The Future of Plastics', desc: 'Watch the recording of our expert panel.' },
+                        { type: 'link', icon: 'fa-link', title: 'External Resource: Ellen MacArthur Foundation', desc: 'Explore the global leaders in circular economy thinking.' }
+                    ]
+                },
+                'teacher': {
+                    title: 'Resources for the Classroom',
+                     resources: [
+                        { type: 'pdf', icon: 'fa-file-zipper', title: 'Lesson Plan Pack (KS1 & KS2)', desc: 'Downloadable lesson plans, worksheets, and activities.' },
+                        { type: 'video', icon: 'fa-truck-fast', title: 'Virtual Tour of a Recycling Facility', desc: 'Show your students what happens after the bin is collected.' },
+                        { type: 'interactive', icon: 'fa-gamepad', title: 'The Recycling Sorter Game', desc: 'An interactive game to test your students\' knowledge.' }
+                    ]
+                }
+            };
+            function updateEducationContent(persona) {
+                const data = educationData[persona];
+                let html = `<h4 class="font-semibold text-lg mb-3 text-[#228B22]">${data.title}</h4><div class="space-y-3">`;
+                data.resources.forEach(resource => {
+                    html += `
+                        <a href="#" class="flex items-center gap-4 p-3 bg-white rounded-md hover:bg-gray-200 transition-colors border">
+                            <i class="fa-solid ${resource.icon} fa-xl w-8 text-center text-gray-600"></i>
+                            <div>
+                                <p class="font-semibold">${resource.title}</p>
+                                <p class="text-sm text-gray-600">${resource.desc}</p>
+                            </div>
+                        </a>
+                    `;
+                });
+                html += `</div>`;
+                educationContentDiv.innerHTML = html;
+            }
+            if (personaSelector) {
+                personaSelector.addEventListener('change', (e) => updateEducationContent(e.target.value));
+                updateEducationContent(personaSelector.value); // Initial content
+            }
+            
+            // --- INITIALIZATION ---
+            if (indicatorsContainer) {
+                createIndicators();
+            }
+            goToSlide(0);
+        });
+    </script>
+</body>
+</html>
